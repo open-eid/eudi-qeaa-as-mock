@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public record TokenResponse(String accessToken,
                             String tokenType,
                             String cNonce,
-                            Long cNonceExpiresIn,
-                            AuthorizationDetails authorizationDetails) {
+                            Long cNonceExpiresIn) {
 
 }

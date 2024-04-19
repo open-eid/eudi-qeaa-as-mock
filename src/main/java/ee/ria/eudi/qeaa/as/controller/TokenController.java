@@ -1,5 +1,7 @@
 package ee.ria.eudi.qeaa.as.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -23,6 +25,7 @@ import ee.ria.eudi.qeaa.as.validation.DPoPValidator;
 import ee.ria.eudi.qeaa.as.validation.PKCEValidator;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 @Validated
@@ -51,6 +55,7 @@ public class TokenController {
     private final ECDSASigner asSigner;
     private final JWSAlgorithm asSigningKeyJwsAlg;
     private final CredentialNonceService credentialNonceService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping(path = TOKEN_REQUEST_MAPPING)
     public ResponseEntity<TokenResponse> tokenRequest(@RequestHeader("DPoP") String dPoPHeader,
@@ -66,16 +71,15 @@ public class TokenController {
         String audience = properties.as().baseUrl() + TOKEN_REQUEST_MAPPING;
         clientAttestationValidator.validate(clientAssertion, audience);
         SignedJWT dPoPJwt = dPoPValidator.validate(dPoPHeader, clientId);
-        AuthorizationDetails authorizationDetails = session.getAuthorizationDetails().getFirst();
-        String credentialIssuerId = authorizationDetails.getLocations().getFirst();
-
-        SignedJWT accessToken = getSenderConstrainedAccessToken(session.getSubject(), clientId, dPoPJwt, credentialIssuerId);
+        List<AuthorizationDetails> authorizationDetails = session.getAuthorizationDetails();
+        String credentialIssuerId = getCredentialIssuerId(authorizationDetails);
+        SignedJWT accessToken = getSenderConstrainedAccessToken(session.getSubject(), clientId, dPoPJwt, credentialIssuerId, authorizationDetails);
         CredentialNonce credentialNonce = credentialNonceService.requestNonce(credentialIssuerId, accessToken); // TODO: Request nonce only if nonce endpoint url in issuer metadata
+
         TokenResponse response = new TokenResponse(accessToken.serialize(),
             "DPoP",
             credentialNonce.cNonce(),
-            credentialNonce.cNonceExpiresIn(),
-            authorizationDetails);
+            credentialNonce.cNonceExpiresIn());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -87,19 +91,35 @@ public class TokenController {
         return session;
     }
 
-    private SignedJWT getSenderConstrainedAccessToken(String subject, String clientId, SignedJWT dPoPJwt, String credentialIssuerId) throws JOSEException {
+    private static String getCredentialIssuerId(List<AuthorizationDetails> authorizationDetails) {
+        List<String> locations = authorizationDetails.stream()
+            .flatMap(ad -> ad.getLocations().stream())
+            .distinct()
+            .toList();
+        if (locations.isEmpty()) {
+            throw new ServiceException("Location is required for credential issuer identification.");
+        } else if (locations.size() != 1) {
+            throw new NotImplementedException("Multiple locations are not supported yet."); // TODO: OpenID4VCI is not clear about how to process authorization details, if different locations are provided.
+        }
+        String credentialIssuerId = locations.getFirst();
+        return credentialIssuerId;
+    }
+
+    private SignedJWT getSenderConstrainedAccessToken(String subject, String clientId, SignedJWT dPoPJwt, String credentialIssuerId, List<AuthorizationDetails> authorizationDetails) throws JOSEException {
         JWK dPoPKey = dPoPJwt.getHeader().getJWK();
+        JWTClaimsSet accessTokenClaims = getAccessTokenClaims(subject, clientId, credentialIssuerId, dPoPKey, authorizationDetails);
         SignedJWT accessToken = new SignedJWT(new JWSHeader.Builder(asSigningKeyJwsAlg)
             .type(JOSEObjectType.JWT)
-            .build(), getAccessTokenClaims(subject, clientId, credentialIssuerId, dPoPKey));
+            .build(), accessTokenClaims);
         accessToken.sign(asSigner);
         return accessToken;
     }
 
-    private JWTClaimsSet getAccessTokenClaims(String subject, String clientId, String audience, JWK dPoPKey) throws JOSEException {
+    private JWTClaimsSet getAccessTokenClaims(String subject, String clientId, String audience, JWK dPoPKey, List<AuthorizationDetails> authorizationDetails) throws JOSEException {
         JWTID jti = new JWTID(40);
         long issuedAtClaim = Instant.now().getEpochSecond();
         long expClaim = issuedAtClaim + properties.as().ttl().accessToken().toSeconds();
+
         return new JWTClaimsSet.Builder()
             .claim(JWTClaimNames.ISSUER, properties.as().baseUrl())
             .claim(JWTClaimNames.SUBJECT, subject)
@@ -108,6 +128,8 @@ public class TokenController {
             .claim(JWTClaimNames.ISSUED_AT, issuedAtClaim)
             .claim(JWTClaimNames.EXPIRATION_TIME, expClaim)
             .claim("client_id", clientId)
+            .claim("authorization_details", objectMapper.<List<Object>>convertValue(authorizationDetails, new TypeReference<>() {
+            }))
             .claim("cnf", Map.of("jkt", dPoPKey.computeThumbprint().toString()))
             .build();
     }
