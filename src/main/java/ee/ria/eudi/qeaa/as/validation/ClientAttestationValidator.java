@@ -26,7 +26,17 @@ import java.util.Set;
 public class ClientAttestationValidator {
     public static final String JOSE_TYPE_WALLET_ATTESTATION_JWT = "wallet-attestation+jwt";
     public static final String JOSE_TYPE_WALLET_ATTESTATION_POP_JWT = "wallet-attestation-pop+jwt";
-    public static final Set<JWSAlgorithm> ACCEPTED_JWS_ALGORITHMS = Set.of(JWSAlgorithm.RS256, JWSAlgorithm.RS384, JWSAlgorithm.RS512, JWSAlgorithm.ES256, JWSAlgorithm.ES384, JWSAlgorithm.ES512);
+    public static final Set<JWSAlgorithm> ACCEPTED_JWS_ALGORITHMS = Set.of(
+        JWSAlgorithm.RS256,
+        JWSAlgorithm.RS384,
+        JWSAlgorithm.RS512,
+        JWSAlgorithm.ES256,
+        JWSAlgorithm.ES384,
+        JWSAlgorithm.ES512,
+        JWSAlgorithm.PS256,
+        JWSAlgorithm.PS384,
+        JWSAlgorithm.PS512
+    );
     private final KeyStore walletProviderTruststore;
 
     public Pair<SignedJWT, SignedJWT> validate(String clientAssertion, String audience) throws ParseException {

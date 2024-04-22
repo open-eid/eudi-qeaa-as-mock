@@ -23,7 +23,17 @@ import static ee.ria.eudi.qeaa.as.controller.ParController.PAR_REQUEST_MAPPING;
 @Component
 @RequiredArgsConstructor
 public class AuthorizationRequestValidator {
-    public static final Set<JWSAlgorithm> ACCEPTED_JWS_ALGORITHMS = Set.of(JWSAlgorithm.RS256, JWSAlgorithm.RS384, JWSAlgorithm.RS512, JWSAlgorithm.ES256, JWSAlgorithm.ES384, JWSAlgorithm.ES512);
+    public static final Set<JWSAlgorithm> ACCEPTED_JWS_ALGORITHMS = Set.of(
+        JWSAlgorithm.RS256,
+        JWSAlgorithm.RS384,
+        JWSAlgorithm.RS512,
+        JWSAlgorithm.ES256,
+        JWSAlgorithm.ES384,
+        JWSAlgorithm.ES512,
+        JWSAlgorithm.PS256,
+        JWSAlgorithm.PS384,
+        JWSAlgorithm.PS512
+    );
     private final AuthorizationServerProperties.AuthorizationServer asProperties;
 
     public JWTClaimsSet validate(String requestObject, SignedJWT clientAttestation) {
