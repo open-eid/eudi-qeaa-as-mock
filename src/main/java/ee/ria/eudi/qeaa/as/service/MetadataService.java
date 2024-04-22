@@ -41,8 +41,8 @@ public class MetadataService {
                 "ES256",
                 "ES384",
                 "ES512",
-                "PS384",
                 "PS256",
+                "PS384",
                 "PS512"
             ))
             .requestObjectSigningAlgValuesSupported(List.of(
@@ -52,8 +52,8 @@ public class MetadataService {
                 "ES256",
                 "ES384",
                 "ES512",
-                "PS384",
                 "PS256",
+                "PS384",
                 "PS512"
             ))
             .codeChallengeMethodsSupported(List.of("S256"))
