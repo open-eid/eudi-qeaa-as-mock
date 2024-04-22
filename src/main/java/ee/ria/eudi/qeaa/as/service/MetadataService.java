@@ -34,8 +34,28 @@ public class MetadataService {
             .grantTypesSupported(List.of("authorization_code"))
             .responseTypesSupported(List.of("code"))
             .tokenEndpointAuthMethodsSupported(List.of("attest_jwt_client_auth"))
-            .dpopSigningAlgValuesSupported(List.of("RS256", "RS384", "RS512", "ES256", "ES384", "ES512"))
-            .requestObjectSigningAlgValuesSupported(List.of("RS256", "RS384", "RS512", "ES256", "ES384", "ES512"))
+            .dpopSigningAlgValuesSupported(List.of(
+                "RS256",
+                "RS384",
+                "RS512",
+                "ES256",
+                "ES384",
+                "ES512",
+                "PS384",
+                "PS256",
+                "PS512"
+            ))
+            .requestObjectSigningAlgValuesSupported(List.of(
+                "RS256",
+                "RS384",
+                "RS512",
+                "ES256",
+                "ES384",
+                "ES512",
+                "PS384",
+                "PS256",
+                "PS512"
+            ))
             .codeChallengeMethodsSupported(List.of("S256"))
             .build();
     }
