@@ -7,9 +7,11 @@ import ee.ria.eudi.qeaa.as.model.vp.CredentialNamespace;
 import id.walt.mdoc.COSECryptoProviderKeyInfo;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
 import id.walt.mdoc.cose.COSESign1;
+import id.walt.mdoc.dataelement.DataElement;
 import id.walt.mdoc.dataelement.EncodedCBORElement;
 import id.walt.mdoc.dataelement.ListElement;
 import id.walt.mdoc.dataelement.MapElement;
+import id.walt.mdoc.dataelement.NullElement;
 import id.walt.mdoc.dataelement.StringElement;
 import id.walt.mdoc.doc.MDoc;
 import id.walt.mdoc.issuersigned.IssuerSigned;
@@ -83,8 +85,19 @@ public class MDocUtil {
     }
 
     public DeviceAuthentication getDeviceAuthentication(String clientId, String nonce, String doctype) {
-        ListElement sessionTranscript = new ListElement(List.of(new StringElement("openID4VPHandover"),
-            new StringElement(clientId), new StringElement(nonce)));
+        ListElement sessionTranscript = new ListElement(
+            List.<DataElement<?>>of(
+                new NullElement(),
+                new NullElement(),
+                new ListElement(
+                    List.of(
+                        new StringElement("openID4VPHandover"),
+                        new StringElement(clientId),
+                        new StringElement(nonce))
+                )
+
+            )
+        );
         EncodedCBORElement deviceNameSpaces = new EncodedCBORElement(new MapElement(Map.of()));
         return new DeviceAuthentication(sessionTranscript, doctype, deviceNameSpaces);
     }
