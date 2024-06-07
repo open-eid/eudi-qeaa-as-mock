@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>oauth2-oidc-sdk</artifactId>
-            <version>11.10</version>
+            <version>11.19</version>
         </dependency>
         <dependency>
             <groupId>id.walt</groupId>
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>com.upokecenter</groupId>
             <artifactId>cbor</artifactId>
-            <version>4.5.3</version>
+            <version>4.5.6</version>
         </dependency>
         <dependency>
             <groupId>com.augustcellars.cose</groupId>
@@ -101,7 +101,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.78</version>
+            <version>1.78.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -115,12 +115,12 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>5.3.2</version>
+            <version>5.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator</artifactId>
-            <version>0.50</version>
+            <version>0.52</version>
         </dependency>
 
         <dependency>
@@ -136,6 +136,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <docker>
+                        <host>//./pipe/dockerDesktopLinuxEngine</host>
+                    </docker>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -154,7 +157,7 @@
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>7.0.0</version>
+                <version>9.0.1</version>
             </plugin>
         </plugins>
     </build>
