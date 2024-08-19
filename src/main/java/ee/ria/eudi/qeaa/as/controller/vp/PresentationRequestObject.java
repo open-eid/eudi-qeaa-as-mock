@@ -39,12 +39,14 @@ public record PresentationRequestObject(
         }
     }
 
+    @RequiredArgsConstructor
     public enum ResponseMode {
-        DIRECT_POST, FRAGMENT;
+        DIRECT_POST("direct_post"), DIRECT_POST_JWT("direct_post.jwt");
+        private final String value;
 
         @JsonValue
         public String value() {
-            return this.name().toLowerCase();
+            return value;
         }
     }
 }

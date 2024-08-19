@@ -8,12 +8,16 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.Nonce;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
 import ee.ria.eudi.qeaa.as.controller.vp.PresentationDefinition.Field;
+import ee.ria.eudi.qeaa.as.controller.vp.PresentationDefinition.InputDescriptor;
+import ee.ria.eudi.qeaa.as.controller.vp.VerifierMetadata.MsoMdoc;
+import ee.ria.eudi.qeaa.as.controller.vp.VerifierMetadata.VpFormats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
-import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseMode.DIRECT_POST;
+import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseMode.DIRECT_POST_JWT;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseType.VP_TOKEN;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationResponseController.RESPONSE_REQUEST_MAPPING;
 
@@ -39,15 +43,15 @@ public class PresentationRequestObjectFactory {
     private final String asClientId;
     private final ObjectMapper objectMapper;
 
-    public SignedJWT createPidPresentationRequest(String presentationDefinitionId) throws JOSEException, ParseException {
+    public SignedJWT createPidPresentationRequest(ECKey responseEncryptionKey) throws JOSEException, ParseException {
         PresentationRequestObject requestObject = PresentationRequestObject.builder()
             .clientId(asClientId)
             .clientIdScheme(X509_SAN_DNS)
             .responseType(VP_TOKEN)
-            .responseMode(DIRECT_POST)
+            .responseMode(DIRECT_POST_JWT)
             .responseUri(authorizationServerProperties.as().baseUrl() + RESPONSE_REQUEST_MAPPING)
-            .clientMetadata(getClientMetadata())
-            .presentationDefinition(getPresentationDefinition(presentationDefinitionId))
+            .clientMetadata(getClientMetadata(responseEncryptionKey))
+            .presentationDefinition(getPresentationDefinition())
             .nonce(new Nonce().getValue())
             .state(new State().getValue())
             .build();
@@ -63,7 +67,7 @@ public class PresentationRequestObjectFactory {
         return requestObjectJwt;
     }
 
-    private PresentationDefinition getPresentationDefinition(String presentationDefinitionId) {
+    private PresentationDefinition getPresentationDefinition() {
         Field documentTypeFilter = Field.builder()
             .path(List.of("$.type"))
             .filter(PresentationDefinition.Filter.builder()
@@ -79,25 +83,24 @@ public class PresentationRequestObjectFactory {
             .limitDisclosure("required")
             .fields(fields)
             .build();
-        PresentationDefinition.InputDescriptor inputDescriptor = PresentationDefinition.InputDescriptor.builder()
+        InputDescriptor inputDescriptor = InputDescriptor.builder()
             .id(UUID.randomUUID().toString())
-            .format(Map.of("mso_mdoc", Map.of("alg", List.of("ES256", "ES384", "ES512"))))
+            .format(Map.of("mso_mdoc", Map.of("alg", List.of("ES256", "ES384", "ES512", "EdDSA", "ESB256", "ESB320", "ESB384", "ESB512")))) // ISO-23220-4
             .constraints(constraints)
             .build();
-        List<PresentationDefinition.InputDescriptor> inputDescriptors = List.of(inputDescriptor);
         return PresentationDefinition.builder()
-            .id(presentationDefinitionId)
+            .id(UUID.randomUUID().toString())
             .name("PID presentation request")
             .purpose("User authentication")
-            .inputDescriptors(inputDescriptors)
+            .inputDescriptors(List.of(inputDescriptor))
             .build();
     }
 
-    private VerifierMetadata getClientMetadata() {
-        VerifierMetadata.MsoMdoc msoMdoc = VerifierMetadata.MsoMdoc.builder()
-            .alg(List.of("ES256", "ES384", "ES512"))
+    private VerifierMetadata getClientMetadata(ECKey responseEncryptionKey) throws JOSEException {
+        MsoMdoc msoMdoc = MsoMdoc.builder()
+            .alg(List.of("ES256", "ES384", "ES512", "EdDSA")) // ISO-23220-4
             .build();
-        VerifierMetadata.VpFormats vpFormats = VerifierMetadata.VpFormats.builder()
+        VpFormats vpFormats = VpFormats.builder()
             .msoMdoc(msoMdoc)
             .build();
         return VerifierMetadata.builder()
@@ -105,6 +108,9 @@ public class PresentationRequestObjectFactory {
             .clientUri(authorizationServerProperties.as().baseUrl() + "/info")
             .logoUri(authorizationServerProperties.as().baseUrl() + "/as_logo.png")
             .vpFormats(vpFormats)
+            .authorizationEncryptedResponseAlg("ECDH-ES")
+            .authorizationEncryptedResponseEnc("A128CBC-HS256")
+            .jwks(new JWKSet(responseEncryptionKey.toPublicJWK()).toJSONObject())
             .build();
     }
 }

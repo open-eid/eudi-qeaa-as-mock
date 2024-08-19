@@ -9,8 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Entity
 @Table(name = "presentation_requests")
@@ -26,7 +29,8 @@ public class PresentationRequest {
     @Column(name = "request_object_value")
     private String value;
     private Instant expiryTime;
-    private String presentationDefinitionId;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> presentationDefinition;
     private String state;
     private String nonce;
 }

@@ -1,6 +1,11 @@
 package ee.ria.eudi.qeaa.as.controller;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
@@ -65,17 +70,22 @@ public class AuthorizationController {
 
     private String createPidPresentationRequest(Session session) throws JOSEException, ParseException {
         String presentationRequestUriId = UUID.randomUUID().toString();
-        String presentationDefinitionId = UUID.randomUUID().toString();
-        SignedJWT pidPresentationRequest = presentationRequestObjectFactory.createPidPresentationRequest(presentationDefinitionId);
-        JWTClaimsSet presentationRequestClaims = pidPresentationRequest.getJWTClaimsSet();
+        ECKey responseEncryptionKey = new ECKeyGenerator(Curve.P_256)
+            .keyUse(KeyUse.ENCRYPTION)
+            .algorithm(JWEAlgorithm.ECDH_ES)
+            .keyID(UUID.randomUUID().toString())
+            .generate();
+        SignedJWT pidPresentationRequest = presentationRequestObjectFactory.createPidPresentationRequest(responseEncryptionKey);
+        JWTClaimsSet requestClaims = pidPresentationRequest.getJWTClaimsSet();
         session.setPresentationRequest(PresentationRequest.builder()
             .requestUriId(presentationRequestUriId)
             .value(pidPresentationRequest.serialize())
-            .presentationDefinitionId(presentationDefinitionId)
-            .state(presentationRequestClaims.getStringClaim("state"))
-            .nonce(presentationRequestClaims.getStringClaim("nonce"))
+            .presentationDefinition(requestClaims.getJSONObjectClaim("presentation_definition"))
+            .state(requestClaims.getStringClaim("state"))
+            .nonce(requestClaims.getStringClaim("nonce"))
             .expiryTime(Instant.now().plusSeconds(authorizationServerProperties.as().ttl().requestUri().toSeconds()))
             .build());
+        session.setResponseEncryptionKey(responseEncryptionKey);
         sessionRepository.save(session);
         return presentationRequestUriId;
     }

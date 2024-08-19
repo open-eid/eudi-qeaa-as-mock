@@ -1,10 +1,8 @@
 package ee.ria.eudi.qeaa.as.error;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class ServiceException extends RuntimeException {
     private final ErrorCode errorCode;
 

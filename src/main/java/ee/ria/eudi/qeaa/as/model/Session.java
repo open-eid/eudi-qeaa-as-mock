@@ -1,5 +1,6 @@
 package ee.ria.eudi.qeaa.as.model;
 
+import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import ee.ria.eudi.qeaa.as.controller.vp.PresentationRequest;
 import ee.ria.eudi.qeaa.as.controller.vp.PresentationResponse;
@@ -9,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -46,6 +48,8 @@ public class Session {
     @OneToOne(cascade = CascadeType.ALL)
     private PresentationResponse presentationResponse;
     private String subject;
+    @Lob
+    private ECKey responseEncryptionKey;
 
     @Builder
     public Session(URI requestUri, Instant requestUriExpirationTime, JWTClaimsSet requestObjectClaims) throws ParseException {

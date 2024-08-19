@@ -22,7 +22,6 @@ public class PresentationResponse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Lob
-    private String vpToken;
-    private String presentationSubmission;
+    private String response;
     private String responseCode;
 }
