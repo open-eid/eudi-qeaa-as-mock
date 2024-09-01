@@ -1,7 +1,6 @@
 package ee.ria.eudi.qeaa.as.service;
 
 import com.nimbusds.jwt.SignedJWT;
-import ee.ria.eudi.qeaa.as.model.CredentialNonce;
 import ee.ria.eudi.qeaa.as.util.AccessTokenUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

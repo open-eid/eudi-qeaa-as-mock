@@ -3,8 +3,6 @@ package ee.ria.eudi.qeaa.as.controller.vp;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
 import ee.ria.eudi.qeaa.as.error.ServiceException;
 import ee.ria.eudi.qeaa.as.model.Session;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationResponse;
-import ee.ria.eudi.qeaa.as.model.vp.ResponseCodeResponse;
 import ee.ria.eudi.qeaa.as.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

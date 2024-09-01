@@ -4,7 +4,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.id.State;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
-import ee.ria.eudi.qeaa.as.model.ParResponse;
 import ee.ria.eudi.qeaa.as.model.Session;
 import ee.ria.eudi.qeaa.as.repository.SessionRepository;
 import ee.ria.eudi.qeaa.as.validation.AuthorizationRequestValidator;

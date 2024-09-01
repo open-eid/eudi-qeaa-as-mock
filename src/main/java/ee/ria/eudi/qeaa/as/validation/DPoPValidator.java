@@ -27,7 +27,7 @@ import static ee.ria.eudi.qeaa.as.controller.TokenController.TOKEN_REQUEST_MAPPI
 @Component
 @RequiredArgsConstructor
 public class DPoPValidator {
-    public static final String JOSE_TYPE_DPOP_JWT = "dpop+jwt";
+    public static final JOSEObjectType JOSE_TYPE_DPOP_JWT = new JOSEObjectType("dpop+jwt");
     private final JwsHeaderKeySelector jwsHeaderKeySelector = new JwsHeaderKeySelector(Set.of(
         JWSAlgorithm.RS256,
         JWSAlgorithm.RS384,
@@ -49,7 +49,7 @@ public class DPoPValidator {
             SignedJWT dPoPJwt = SignedJWT.parse(dPoPHeader);
             ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
             jwtProcessor.setJWSKeySelector(jwsHeaderKeySelector);
-            jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType(JOSE_TYPE_DPOP_JWT)));
+            jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(JOSE_TYPE_DPOP_JWT));
             jwtProcessor.setJWTClaimsSetVerifier(getClaimsVerifier(expectedIssuer));
             jwtProcessor.process(dPoPJwt, null);
             return dPoPJwt;

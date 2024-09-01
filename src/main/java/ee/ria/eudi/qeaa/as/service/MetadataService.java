@@ -3,7 +3,6 @@ package ee.ria.eudi.qeaa.as.service;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWKSet;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
-import ee.ria.eudi.qeaa.as.model.AuthorizationServerMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

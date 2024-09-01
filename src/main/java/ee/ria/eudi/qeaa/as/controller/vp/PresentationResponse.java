@@ -1,4 +1,4 @@
-package ee.ria.eudi.qeaa.as.model.vp;
+package ee.ria.eudi.qeaa.as.controller.vp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

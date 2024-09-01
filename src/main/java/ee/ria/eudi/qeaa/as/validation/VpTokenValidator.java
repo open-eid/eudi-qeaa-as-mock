@@ -1,9 +1,9 @@
 package ee.ria.eudi.qeaa.as.validation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.ria.eudi.qeaa.as.controller.vp.CredentialNamespace;
+import ee.ria.eudi.qeaa.as.controller.vp.PresentationSubmission;
 import ee.ria.eudi.qeaa.as.error.ServiceException;
-import ee.ria.eudi.qeaa.as.model.vp.CredentialNamespace;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationSubmission;
 import ee.ria.eudi.qeaa.as.util.MDocUtil;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
 import id.walt.mdoc.doc.MDoc;

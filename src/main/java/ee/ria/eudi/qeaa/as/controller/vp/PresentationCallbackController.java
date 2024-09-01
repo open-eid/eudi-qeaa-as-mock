@@ -3,9 +3,6 @@ package ee.ria.eudi.qeaa.as.controller.vp;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import ee.ria.eudi.qeaa.as.error.ServiceException;
 import ee.ria.eudi.qeaa.as.model.Session;
-import ee.ria.eudi.qeaa.as.model.vp.CredentialNamespace;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationRequest;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationResponse;
 import ee.ria.eudi.qeaa.as.repository.SessionRepository;
 import ee.ria.eudi.qeaa.as.validation.VpTokenValidator;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +17,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
-import static ee.ria.eudi.qeaa.as.model.vp.CredentialAttribute.EU_EUROPA_EC_EUDI_PID_EE_1_PERSONAL_IDENTIFICATION_NUMBER;
-import static ee.ria.eudi.qeaa.as.model.vp.CredentialNamespace.EU_EUROPA_EC_EUDI_PID_EE_1;
+import static ee.ria.eudi.qeaa.as.controller.vp.CredentialAttribute.EU_EUROPA_EC_EUDI_PID_EE_1_PERSONAL_IDENTIFICATION_NUMBER;
+import static ee.ria.eudi.qeaa.as.controller.vp.CredentialNamespace.EU_EUROPA_EC_EUDI_PID_EE_1;
 
 @RestController
 @RequiredArgsConstructor

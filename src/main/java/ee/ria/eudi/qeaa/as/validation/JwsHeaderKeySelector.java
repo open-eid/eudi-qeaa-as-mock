@@ -32,23 +32,24 @@ public class JwsHeaderKeySelector implements JWSKeySelector<SecurityContext> {
             throw new KeySourceException("JWS header algorithm not accepted: " + alg);
         }
         JWK jwk = header.getJWK();
-        if (jwk == null) {
-            throw new KeySourceException("Missing JWS jwk header parameter");
-        }
-        if (JWSAlgorithm.Family.RSA.contains(alg) && jwk instanceof RSAKey rsaKey) {
-            try {
-                return List.of(rsaKey.toRSAPublicKey());
-            } catch (JOSEException e) {
-                throw new KeySourceException("Invalid RSA JWK: " + e.getMessage(), e);
+        switch (jwk) {
+            case null -> throw new KeySourceException("Missing JWS jwk header parameter");
+            case RSAKey rsaKey when JWSAlgorithm.Family.RSA.contains(alg) -> {
+                try {
+                    return List.of(rsaKey.toRSAPublicKey());
+                } catch (JOSEException e) {
+                    throw new KeySourceException("Invalid RSA JWK: " + e.getMessage(), e);
+                }
             }
-        } else if (JWSAlgorithm.Family.EC.contains(alg) && jwk instanceof ECKey ecKey) {
-            try {
-                return List.of(ecKey.toECPublicKey());
-            } catch (JOSEException e) {
-                throw new KeySourceException("Invalid EC JWK: " + e.getMessage(), e);
+            case ECKey ecKey when JWSAlgorithm.Family.EC.contains(alg) -> {
+                try {
+                    return List.of(ecKey.toECPublicKey());
+                } catch (JOSEException e) {
+                    throw new KeySourceException("Invalid EC JWK: " + e.getMessage(), e);
+                }
             }
-        } else {
-            throw new KeySourceException("JWS header alg / jwk mismatch: alg=" + alg + " jwk.kty=" + jwk.getKeyType());
+            default ->
+                throw new KeySourceException("JWS header alg / jwk mismatch: alg=" + alg + " jwk.kty=" + jwk.getKeyType());
         }
     }
 }

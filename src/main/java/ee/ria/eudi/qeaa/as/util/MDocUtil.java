@@ -3,7 +3,7 @@ package ee.ria.eudi.qeaa.as.util;
 import COSE.AlgorithmID;
 import COSE.OneKey;
 import com.upokecenter.cbor.CBORObject;
-import ee.ria.eudi.qeaa.as.model.vp.CredentialNamespace;
+import ee.ria.eudi.qeaa.as.controller.vp.CredentialNamespace;
 import id.walt.mdoc.COSECryptoProviderKeyInfo;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
 import id.walt.mdoc.cose.COSESign1;

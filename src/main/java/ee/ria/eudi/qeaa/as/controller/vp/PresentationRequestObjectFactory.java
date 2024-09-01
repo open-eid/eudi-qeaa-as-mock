@@ -13,12 +13,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.Nonce;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
-import ee.ria.eudi.qeaa.as.model.vp.CredentialAttribute;
-import ee.ria.eudi.qeaa.as.model.vp.CredentialDoctype;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationDefinition;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationDefinition.Field;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationRequestObject;
-import ee.ria.eudi.qeaa.as.model.vp.VerifierMetadata;
+import ee.ria.eudi.qeaa.as.controller.vp.PresentationDefinition.Field;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
+import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseMode.DIRECT_POST;
+import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseType.VP_TOKEN;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationResponseController.RESPONSE_REQUEST_MAPPING;
-import static ee.ria.eudi.qeaa.as.model.vp.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
-import static ee.ria.eudi.qeaa.as.model.vp.PresentationRequestObject.ResponseMode.DIRECT_POST;
-import static ee.ria.eudi.qeaa.as.model.vp.PresentationRequestObject.ResponseType.VP_TOKEN;
 
 @Component
 @RequiredArgsConstructor

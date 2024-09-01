@@ -1,4 +1,4 @@
-package ee.ria.eudi.qeaa.as.model;
+package ee.ria.eudi.qeaa.as.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

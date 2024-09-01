@@ -2,7 +2,6 @@ package ee.ria.eudi.qeaa.as.controller.vp;
 
 import ee.ria.eudi.qeaa.as.error.ServiceException;
 import ee.ria.eudi.qeaa.as.model.Session;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationRequest;
 import ee.ria.eudi.qeaa.as.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

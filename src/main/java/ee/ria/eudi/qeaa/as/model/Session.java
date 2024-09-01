@@ -1,8 +1,8 @@
 package ee.ria.eudi.qeaa.as.model;
 
 import com.nimbusds.jwt.JWTClaimsSet;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationRequest;
-import ee.ria.eudi.qeaa.as.model.vp.PresentationResponse;
+import ee.ria.eudi.qeaa.as.controller.vp.PresentationRequest;
+import ee.ria.eudi.qeaa.as.controller.vp.PresentationResponse;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;

@@ -24,8 +24,8 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class ClientAttestationValidator {
-    public static final String JOSE_TYPE_WALLET_ATTESTATION_JWT = "wallet-attestation+jwt";
-    public static final String JOSE_TYPE_WALLET_ATTESTATION_POP_JWT = "wallet-attestation-pop+jwt";
+    public static final JOSEObjectType JOSE_TYPE_WALLET_ATTESTATION_JWT = new JOSEObjectType("wallet-attestation+jwt");
+    public static final JOSEObjectType JOSE_TYPE_WALLET_ATTESTATION_POP_JWT = new JOSEObjectType("wallet-attestation-pop+jwt");
     public static final Set<JWSAlgorithm> ACCEPTED_JWS_ALGORITHMS = Set.of(
         JWSAlgorithm.RS256,
         JWSAlgorithm.RS384,
@@ -52,7 +52,7 @@ public class ClientAttestationValidator {
         try {
             ConfigurableJWTProcessor<SecurityContext> clientAttestationJwtProcessor = new DefaultJWTProcessor<>();
             clientAttestationJwtProcessor.setJWSKeySelector(new X5ChainKeySelector(walletProviderTruststore, ACCEPTED_JWS_ALGORITHMS));
-            clientAttestationJwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType(JOSE_TYPE_WALLET_ATTESTATION_JWT)));
+            clientAttestationJwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(JOSE_TYPE_WALLET_ATTESTATION_JWT));
             clientAttestationJwtProcessor.setJWTClaimsSetVerifier(getClientAttestationClaimsVerifier());
             return clientAttestationJwtProcessor.process(clientAttestation, null);
         } catch (BadJOSEException | JOSEException ex) {
@@ -64,7 +64,7 @@ public class ClientAttestationValidator {
         try {
             ConfigurableJWTProcessor<SecurityContext> clientAttestationPoPJwtProcessor = new DefaultJWTProcessor<>();
             clientAttestationPoPJwtProcessor.setJWSKeySelector(new ClientAttestationKeySelector(clientAttestation, ACCEPTED_JWS_ALGORITHMS));
-            clientAttestationPoPJwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType(JOSE_TYPE_WALLET_ATTESTATION_POP_JWT)));
+            clientAttestationPoPJwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(JOSE_TYPE_WALLET_ATTESTATION_POP_JWT));
             clientAttestationPoPJwtProcessor.setJWTClaimsSetVerifier(getClientAttestationPoPClaimsVerifier(audience, claimsSet.getSubject()));
             clientAttestationPoPJwtProcessor.process(clientAttestationPoP, null);
         } catch (BadJOSEException | JOSEException ex) {

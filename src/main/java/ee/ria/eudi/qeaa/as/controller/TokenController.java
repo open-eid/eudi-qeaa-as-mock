@@ -15,10 +15,9 @@ import com.nimbusds.oauth2.sdk.id.JWTID;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
 import ee.ria.eudi.qeaa.as.error.ServiceException;
 import ee.ria.eudi.qeaa.as.model.AuthorizationDetails;
-import ee.ria.eudi.qeaa.as.model.CredentialNonce;
 import ee.ria.eudi.qeaa.as.model.Session;
-import ee.ria.eudi.qeaa.as.model.TokenResponse;
 import ee.ria.eudi.qeaa.as.repository.SessionRepository;
+import ee.ria.eudi.qeaa.as.service.CredentialNonce;
 import ee.ria.eudi.qeaa.as.service.CredentialNonceService;
 import ee.ria.eudi.qeaa.as.validation.ClientAttestationValidator;
 import ee.ria.eudi.qeaa.as.validation.DPoPValidator;
@@ -43,6 +42,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class TokenController {
+    public static final JOSEObjectType JOSE_TYPE_AT_JWT = new JOSEObjectType("at+jwt");
     public static final String REQUIRED_CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-client-attestation";
     public static final String REQUIRED_CLIENT_ASSERTION_FORMAT = "[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+~[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+";
     public static final String TOKEN_REQUEST_MAPPING = "/token";
@@ -101,15 +101,14 @@ public class TokenController {
         } else if (locations.size() != 1) {
             throw new NotImplementedException("Multiple locations are not supported yet."); // TODO: OpenID4VCI is not clear about how to process authorization details, if different locations are provided.
         }
-        String credentialIssuerId = locations.getFirst();
-        return credentialIssuerId;
+        return locations.getFirst();
     }
 
     private SignedJWT getSenderConstrainedAccessToken(String subject, String clientId, SignedJWT dPoPJwt, String credentialIssuerId, List<AuthorizationDetails> authorizationDetails) throws JOSEException {
         JWK dPoPKey = dPoPJwt.getHeader().getJWK();
         JWTClaimsSet accessTokenClaims = getAccessTokenClaims(subject, clientId, credentialIssuerId, dPoPKey, authorizationDetails);
         SignedJWT accessToken = new SignedJWT(new JWSHeader.Builder(asSigningKeyJwsAlg)
-            .type(JOSEObjectType.JWT)
+            .type(JOSE_TYPE_AT_JWT)
             .build(), accessTokenClaims);
         accessToken.sign(asSigner);
         return accessToken;
