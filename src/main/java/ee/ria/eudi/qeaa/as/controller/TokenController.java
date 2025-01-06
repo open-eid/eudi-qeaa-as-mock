@@ -25,6 +25,7 @@ import ee.ria.eudi.qeaa.as.validation.PKCEValidator;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -57,7 +58,7 @@ public class TokenController {
     private final CredentialNonceService credentialNonceService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(path = TOKEN_REQUEST_MAPPING)
+    @PostMapping(path = TOKEN_REQUEST_MAPPING, params = "client_assertion")
     public ResponseEntity<TokenResponse> tokenRequest(@RequestHeader("DPoP") String dPoPHeader,
                                                       @RequestParam(name = "client_id") String clientId,
                                                       @RequestParam(name = "grant_type") @Pattern(regexp = REQUIRED_GRANT_TYPE, message = "Invalid grant type") String grantType,
@@ -67,20 +68,37 @@ public class TokenController {
                                                       @RequestParam(name = "client_assertion") @Pattern(regexp = REQUIRED_CLIENT_ASSERTION_FORMAT) String clientAssertion,
                                                       @RequestParam(name = "redirect_uri") String redirectUri) throws ParseException, JOSEException {
         Session session = updateSession(clientId, authorizationCode, redirectUri);
-        pkceValidator.validate(codeVerifier, session);
         String audience = properties.as().baseUrl() + TOKEN_REQUEST_MAPPING;
         clientAttestationValidator.validate(clientAssertion, audience);
+        TokenResponse response = getTokenResponse(dPoPHeader, clientId, codeVerifier, session);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping(path = TOKEN_REQUEST_MAPPING, params = "!client_assertion")
+    public ResponseEntity<TokenResponse> tokenRequest(@RequestHeader("DPoP") String dPoPHeader,
+                                                      @RequestParam(name = "client_id") String clientId,
+                                                      @RequestParam(name = "grant_type") @Pattern(regexp = REQUIRED_GRANT_TYPE, message = "Invalid grant type") String grantType,
+                                                      @RequestParam(name = "code") String authorizationCode,
+                                                      @RequestParam(name = "code_verifier") String codeVerifier,
+                                                      @RequestParam(name = "redirect_uri") String redirectUri) throws JOSEException {
+        Session session = updateSession(clientId, authorizationCode, redirectUri);
+        TokenResponse response = getTokenResponse(dPoPHeader, clientId, codeVerifier, session);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @NotNull
+    private TokenResponse getTokenResponse(String dPoPHeader, String clientId, String codeVerifier, Session session) throws JOSEException {
+        pkceValidator.validate(codeVerifier, session);
         SignedJWT dPoPJwt = dPoPValidator.validate(dPoPHeader, clientId);
         List<AuthorizationDetails> authorizationDetails = session.getAuthorizationDetails();
         String credentialIssuerId = getCredentialIssuerId(authorizationDetails);
         SignedJWT accessToken = getSenderConstrainedAccessToken(session.getSubject(), clientId, dPoPJwt, credentialIssuerId, authorizationDetails);
         CredentialNonce credentialNonce = credentialNonceService.requestNonce(credentialIssuerId, accessToken); // TODO: Request nonce only if nonce endpoint url in issuer metadata
 
-        TokenResponse response = new TokenResponse(accessToken.serialize(),
+        return new TokenResponse(accessToken.serialize(),
             "DPoP",
             credentialNonce.cNonce(),
             credentialNonce.cNonceExpiresIn());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     private Session updateSession(String clientId, String authorizationCode, String redirectUri) {
