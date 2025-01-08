@@ -57,6 +57,7 @@ management:
 
 eudi:
   as:
+    client-id: eudi-as.localhost
     base-url: https://eudi-as.localhost:12443
     max-clock-skew: 5s
     dpop-expiry-time: 60s

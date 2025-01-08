@@ -18,6 +18,8 @@ public record AuthorizationServerProperties(
     @ConfigurationProperties(prefix = "eudi.as")
     public record AuthorizationServer(
         @NotBlank
+        String clientId,
+        @NotBlank
         @Pattern(regexp = ".*(?<!/)$")
         String baseUrl,
         @NotNull

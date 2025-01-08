@@ -26,8 +26,7 @@ import static ee.ria.eudi.qeaa.as.util.MDocUtil.KEY_ID_ISSUER;
 @Component
 @RequiredArgsConstructor
 public class VpTokenValidator {
-    private final AuthorizationServerProperties authorizationServerProperties;
-    private final String asClientId;
+    private final AuthorizationServerProperties.AuthorizationServer asProperties;
     @Qualifier("issuerTrustedRootCAs")
     private final List<X509Certificate> issuerTrustedRootCAs;
 
@@ -49,9 +48,9 @@ public class VpTokenValidator {
         if (!mDoc.verifySignature(issuerCryptoProvider, KEY_ID_ISSUER)) {
             throw new ServiceException("Invalid mDoc issuer signature");
         }
-        DeviceAuthentication deviceAuthentication = MDocUtil.getDeviceAuthentication(asClientId, mDoc.getDocType().getValue(),
-            authorizationServerProperties.as().baseUrl() + RESPONSE_REQUEST_MAPPING, nonce, mDocNonce);
-        log.info("Device authentication for client {} and nonce {} -> cbor hex: {}", asClientId, nonce, deviceAuthentication.toDE().toCBORHex());
+        DeviceAuthentication deviceAuthentication = MDocUtil.getDeviceAuthentication(asProperties.clientId(), mDoc.getDocType().getValue(),
+            asProperties.baseUrl() + RESPONSE_REQUEST_MAPPING, nonce, mDocNonce);
+        log.info("Device authentication for client {} and nonce {} -> cbor hex: {}", asProperties.clientId(), nonce, deviceAuthentication.toDE().toCBORHex());
         SimpleCOSECryptoProvider deviceCryptoProvider = MDocUtil.getDeviceCryptoProvider(mDoc);
         if (!mDoc.verifyDeviceSignature(deviceAuthentication, deviceCryptoProvider, KEY_ID_DEVICE)) {
             throw new ServiceException("Invalid mDoc device signature");

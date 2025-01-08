@@ -36,20 +36,19 @@ import static ee.ria.eudi.qeaa.as.controller.vp.PresentationResponseController.R
 public class PresentationRequestObjectFactory {
     public static final JOSEObjectType OAUTH_AUTHZ_REQ_JWT = new JOSEObjectType("oauth-authz-req+jwt");
 
-    private final AuthorizationServerProperties authorizationServerProperties;
+    private final AuthorizationServerProperties.AuthorizationServer asProperties;
     private final ECDSASigner asSigner;
     private final ECKey asSigningKey;
     private final JWSAlgorithm asSigningKeyJwsAlg;
-    private final String asClientId;
     private final ObjectMapper objectMapper;
 
     public SignedJWT createPidPresentationRequest(ECKey responseEncryptionKey) throws JOSEException, ParseException {
         PresentationRequestObject requestObject = PresentationRequestObject.builder()
-            .clientId(asClientId)
+            .clientId(asProperties.clientId())
             .clientIdScheme(X509_SAN_DNS)
             .responseType(VP_TOKEN)
             .responseMode(DIRECT_POST_JWT)
-            .responseUri(authorizationServerProperties.as().baseUrl() + RESPONSE_REQUEST_MAPPING)
+            .responseUri(asProperties.baseUrl() + RESPONSE_REQUEST_MAPPING)
             .clientMetadata(getClientMetadata(responseEncryptionKey))
             .presentationDefinition(getPresentationDefinition())
             .nonce(new Nonce().getValue())
@@ -105,8 +104,8 @@ public class PresentationRequestObjectFactory {
             .build();
         return VerifierMetadata.builder()
             .clientName("Authorization Server")
-            .clientUri(authorizationServerProperties.as().baseUrl() + "/info")
-            .logoUri(authorizationServerProperties.as().baseUrl() + "/as_logo.png")
+            .clientUri(asProperties.baseUrl() + "/info")
+            .logoUri(asProperties.baseUrl() + "/as_logo.png")
             .vpFormats(vpFormats)
             .authorizationEncryptedResponseAlg("ECDH-ES")
             .authorizationEncryptedResponseEnc("A128CBC-HS256")

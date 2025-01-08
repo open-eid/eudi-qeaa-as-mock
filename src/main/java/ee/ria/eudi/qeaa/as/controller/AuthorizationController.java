@@ -36,8 +36,7 @@ public class AuthorizationController {
     public static final String AUTHORIZE_REQUEST_MAPPING = "/authorize";
     private final SessionRepository sessionRepository;
     private final PresentationRequestObjectFactory presentationRequestObjectFactory;
-    private final AuthorizationServerProperties authorizationServerProperties;
-    private final String asClientId;
+    private final AuthorizationServerProperties.AuthorizationServer asProperties;
     @Value("${eudi.wallet.authorization-url}")
     private String walletAuthorizationUrl;
 
@@ -62,8 +61,8 @@ public class AuthorizationController {
     private ResponseEntity<Void> startPidAuthenticationFlow(Session session) throws JOSEException, ParseException {
         String presentationRequestUriId = createPidPresentationRequest(session);
         URI redirectUri = UriComponentsBuilder.fromUriString(walletAuthorizationUrl)
-            .queryParam("request_uri", authorizationServerProperties.as().baseUrl() + PRESENTATION_REQUEST_MAPPING + "/" + presentationRequestUriId)
-            .queryParam("client_id", asClientId)
+            .queryParam("request_uri", asProperties.baseUrl() + PRESENTATION_REQUEST_MAPPING + "/" + presentationRequestUriId)
+            .queryParam("client_id", asProperties.clientId())
             .build().toUri();
         return ResponseEntity.status(HttpStatus.FOUND).location(redirectUri).build();
     }
@@ -83,7 +82,7 @@ public class AuthorizationController {
             .presentationDefinition(requestClaims.getJSONObjectClaim("presentation_definition"))
             .state(requestClaims.getStringClaim("state"))
             .nonce(requestClaims.getStringClaim("nonce"))
-            .expiryTime(Instant.now().plusSeconds(authorizationServerProperties.as().ttl().requestUri().toSeconds()))
+            .expiryTime(Instant.now().plusSeconds(asProperties.ttl().requestUri().toSeconds()))
             .build());
         session.setResponseEncryptionKey(responseEncryptionKey);
         sessionRepository.save(session);
