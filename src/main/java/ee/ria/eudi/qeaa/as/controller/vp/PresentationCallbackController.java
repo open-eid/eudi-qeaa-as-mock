@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static ee.ria.eudi.qeaa.as.controller.vp.CredentialAttribute.EU_EUROPA_EC_EUDI_PID_EE_1_PERSONAL_IDENTIFICATION_NUMBER;
-import static ee.ria.eudi.qeaa.as.controller.vp.CredentialNamespace.EU_EUROPA_EC_EUDI_PID_EE_1;
+import static ee.ria.eudi.qeaa.as.controller.vp.CredentialAttribute.EU_EUROPA_EC_EUDI_PID_1_PERSONAL_ADMINISTRATIVE_NUMBER;
+import static ee.ria.eudi.qeaa.as.controller.vp.CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationSubmission.InputDescriptor.CREDENTIAL_FORMAT_MSO_MDOC;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationSubmission.InputDescriptor.CREDENTIAL_PATH_AS_DIRECT_VP_TOKEN_VALUE;
 
@@ -55,7 +55,7 @@ public class PresentationCallbackController {
         String vpToken = claimsSet.getStringClaim("vp_token");
         String mdocNonce = header.getAgreementPartyUInfo().decodeToString();
         Map<CredentialNamespace, Map<String, Object>> vpTokenClaims = vpTokenValidator.validateMsoMDoc(vpToken, presentationRequest.getNonce(), mdocNonce);
-        Object subject = vpTokenClaims.getOrDefault(EU_EUROPA_EC_EUDI_PID_EE_1, Collections.emptyMap()).get(EU_EUROPA_EC_EUDI_PID_EE_1_PERSONAL_IDENTIFICATION_NUMBER.getUri());
+        Object subject = vpTokenClaims.getOrDefault(EU_EUROPA_EC_EUDI_PID_1, Collections.emptyMap()).get(EU_EUROPA_EC_EUDI_PID_1_PERSONAL_ADMINISTRATIVE_NUMBER.getUri());
         if (subject == null) {
             throw new ServiceException("Unable to authenticate user");
         }

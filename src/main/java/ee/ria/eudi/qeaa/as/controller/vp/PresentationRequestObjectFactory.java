@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
-import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseMode.DIRECT_POST_JWT;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseType.VP_TOKEN;
 import static ee.ria.eudi.qeaa.as.controller.vp.PresentationResponseController.RESPONSE_REQUEST_MAPPING;
+import static ee.ria.eudi.qeaa.as.controller.vp.PresentationRequestObject.ResponseMode.DIRECT_POST_JWT;
 
 @Component
 @RequiredArgsConstructor
@@ -75,7 +75,7 @@ public class PresentationRequestObjectFactory {
                 .build())
             .build();
         Field personalIdCodeField = Field.builder()
-            .path(List.of(CredentialAttribute.EU_EUROPA_EC_EUDI_PID_EE_1_PERSONAL_IDENTIFICATION_NUMBER.getPresentationDefinitionPath()))
+            .path(List.of(CredentialAttribute.EU_EUROPA_EC_EUDI_PID_1_PERSONAL_ADMINISTRATIVE_NUMBER.getPresentationDefinitionPath()))
             .build();
         List<Field> fields = List.of(documentTypeFilter, personalIdCodeField);
         PresentationDefinition.Constraints constraints = PresentationDefinition.Constraints.builder()

@@ -14,7 +14,7 @@ public enum CredentialAttribute {
     EU_EUROPA_EC_EUDI_PID_1_ISSUING_AUTHORITY(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1, "issuing_authority"),
     EU_EUROPA_EC_EUDI_PID_1_ISSUING_COUNTRY(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1, "issuing_country"),
     EU_EUROPA_EC_EUDI_PID_1_DOCUMENT_NUMBER(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1, "document_number"),
-    EU_EUROPA_EC_EUDI_PID_EE_1_PERSONAL_IDENTIFICATION_NUMBER(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_EE_1, "personal_identification_number");
+    EU_EUROPA_EC_EUDI_PID_1_PERSONAL_ADMINISTRATIVE_NUMBER(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1, "personal_administrative_number");
 
     private final CredentialDoctype doctype;
     private final CredentialNamespace namespace;
