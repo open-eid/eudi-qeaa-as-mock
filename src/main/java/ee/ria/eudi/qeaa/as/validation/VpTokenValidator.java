@@ -1,11 +1,11 @@
 package ee.ria.eudi.qeaa.as.validation;
 
+import com.upokecenter.cbor.CBORObject;
 import ee.ria.eudi.qeaa.as.configuration.properties.AuthorizationServerProperties;
 import ee.ria.eudi.qeaa.as.controller.vp.CredentialNamespace;
 import ee.ria.eudi.qeaa.as.error.ServiceException;
 import ee.ria.eudi.qeaa.as.util.MDocUtil;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
-import id.walt.mdoc.dataretrieval.DeviceResponse;
 import id.walt.mdoc.doc.MDoc;
 import id.walt.mdoc.mdocauth.DeviceAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -67,14 +67,17 @@ public class VpTokenValidator {
     }
 
     private static MDoc getMDocFromDeviceResponse(String vpToken) {
-        DeviceResponse deviceResponse = DeviceResponse.Companion.fromCBOR(Base64.getUrlDecoder().decode(vpToken));
-        if (deviceResponse.getDocumentErrors() != null && !deviceResponse.getDocumentErrors().getValue().isEmpty()) {
+        byte[] vpTokenCbor = Base64.getUrlDecoder().decode(vpToken);
+        CBORObject cborObject = CBORObject.DecodeFromBytes(vpTokenCbor);
+        CBORObject documentErrors = cborObject.get("documentErrors");
+        if (documentErrors != null && documentErrors.size() != 0) {
             throw new ServiceException("Invalid device response");
         }
-        List<MDoc> documents = deviceResponse.getDocuments();
+        CBORObject documents = cborObject.get("documents");
         if (documents.size() != 1) {
             log.warn("Multiple mdoc documents processing from device response is not implemented. Using first document.");
         }
-        return documents.getFirst();
+        byte[] mdocBytes = documents.get(0).EncodeToBytes();
+        return MDoc.Companion.fromCBOR(mdocBytes);
     }
 }
