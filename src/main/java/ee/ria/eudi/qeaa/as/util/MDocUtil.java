@@ -8,7 +8,6 @@ import id.walt.mdoc.COSECryptoProviderKeyInfo;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
 import id.walt.mdoc.cose.COSESign1;
 import id.walt.mdoc.dataelement.ByteStringElement;
-import id.walt.mdoc.dataelement.DataElement;
 import id.walt.mdoc.dataelement.EncodedCBORElement;
 import id.walt.mdoc.dataelement.ListElement;
 import id.walt.mdoc.dataelement.MapElement;
